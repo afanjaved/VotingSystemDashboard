@@ -4,6 +4,7 @@ import "./globals.css";
 import { WagmiProvider } from 'wagmi'
 import { config } from './config'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ToastNotification from "@/components/ui/ToastNotification";
 const queryClient = new QueryClient()
 
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
 
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
+            <ToastNotification />
             {children}
           </QueryClientProvider>
         </WagmiProvider>

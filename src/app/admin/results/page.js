@@ -93,7 +93,7 @@ export default function ElectionResultsPage() {
 
   const handleSearch = () => {
     if (!electionId.trim()) {
-      alert('Enter a valid election ID')
+      toast.error('Enter a valid election ID')
       return
     }
     setTrigger(true)

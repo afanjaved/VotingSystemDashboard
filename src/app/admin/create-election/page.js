@@ -46,7 +46,7 @@ export default function CreateElectionPage() {
 
   const handleCreateElection = async () => {
     if (!title || !startTime || !endTime || candidates.length === 0 || candidates.some(c => c.trim() === '')) {
-      alert('Please fill all fields, including title and candidate names.')
+      toast.error('Please fill all fields, including title and candidate names.')
       return
     }
 
@@ -60,11 +60,11 @@ export default function CreateElectionPage() {
         functionName: 'createElection',
         args: [title, candidates, BigInt(start), BigInt(end)],
       })
-      alert('Election created successfully!')
+      toast.success('Election created successfully!')
       router.push('/admin')
     } catch (error) {
       console.error('Error:', error)
-      alert('Transaction failed')
+      toast.error('Transaction failed')
     }
   }
 

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import toast from 'react-hot-toast'
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
@@ -46,7 +47,7 @@ export default function AddCandidatePage() {
 
   const handleAddCandidate = async () => {
     if (!electionId || !candidateName.trim()) {
-      alert('Select election and enter candidate name.')
+      toast.error('Enter valid election ID and candidate name.')
       return
     }
 
@@ -57,11 +58,11 @@ export default function AddCandidatePage() {
         functionName: 'addCandidate',
         args: [BigInt(electionId), candidateName]
       })
-      alert('Candidate added successfully!')
+      toast.success('Candidate added successfully!')
       router.push('/admin')
     } catch (err) {
       console.error(err)
-      alert('Failed to add candidate.')
+      toast.error('Failed to add candidate.')
     }
   }
 

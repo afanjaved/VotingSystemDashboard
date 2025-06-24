@@ -19,7 +19,7 @@ export default function LoginPage() {
     if (address?.toLowerCase() === ADMIN_WALLET) {
       router.push('/admin');
     } else {
-      alert('You are not authorized as admin!');
+      toast.error('You are not authorized as admin!');
     }
   };
 

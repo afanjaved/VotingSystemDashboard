@@ -52,7 +52,7 @@ export default function WhitelistVotersPage() {
   const handleWhitelist = async () => {
     const id = Number(electionId)
     if (isNaN(id) || addresses.some(addr => !isAddress(addr))) {
-      alert('Enter valid election ID and valid Ethereum addresses.')
+      toast.error('Enter valid election ID and valid Ethereum addresses.')
       return
     }
 
@@ -63,11 +63,11 @@ export default function WhitelistVotersPage() {
         functionName: 'whitelistVoters',
         args: [BigInt(id), addresses]
       })
-      alert('Voters whitelisted successfully!')
+      toast.success('Voters whitelisted successfully!')
       router.push('/admin')
     } catch (err) {
       console.error(err)
-      alert('Failed to whitelist voters.')
+      toast.error('Failed to whitelist voters.')
     }
   }
 

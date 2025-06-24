@@ -3,12 +3,14 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useAccount } from 'wagmi'
+import { useAccount, useDisconnect } from 'wagmi'
+import Image from 'next/image'
 
 const ADMIN_WALLET = '0x705f8186D6514CC037DD08a0Bd16B4a74567f43C'.toLowerCase()
 
 export default function AdminLayout({ children }) {
   const { isConnected, address } = useAccount()
+  const { disconnect } = useDisconnect()
   const router = useRouter()
 
   useEffect(() => {
@@ -25,17 +27,38 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-green-50 text-green-900">
       {/* Sidebar */}
-      <aside className="w-64 bg-green-700 text-white p-6 space-y-6">
-        <h2 className="text-2xl font-bold">Votify Admin</h2>
+      <aside className="w-64 bg-green-700 text-white p-6 flex flex-col justify-between">
+        <div>
+          <Link href="/admin" className="flex items-center justify-center mb-6">
+            <Image
+              src="/logo.png"
+              alt="Votify Logo"
+              width={160}
+              height={60}
+              className="object-contain cursor-pointer"
+              priority
+            />
+          </Link>
 
-        <nav className="space-y-3">
-          <NavLink href="/admin/create-election">🗳️ Create&nbsp;Election</NavLink>
-          <NavLink href="/admin/whitelist">✅ Whitelist&nbsp;Voters</NavLink>
-          <NavLink href="/admin/add-candidate">➕ Add&nbsp;Candidate</NavLink>
-          <NavLink href="/admin/results">📊 View&nbsp;Results</NavLink>
-          <NavLink href="/admin/voters">🔎 Voter&nbsp;Checker</NavLink>
-          <NavLink href="/admin/elections">📊 list&nbsp;Elections</NavLink>
-        </nav>
+          <nav className="space-y-3">
+            <NavLink href="/admin/create-election">🗳️ Create&nbsp;Election</NavLink>
+            <NavLink href="/admin/whitelist">✅ Whitelist&nbsp;Voters</NavLink>
+            <NavLink href="/admin/add-candidate">➕ Add&nbsp;Candidate</NavLink>
+            <NavLink href="/admin/results">📊 View&nbsp;Results</NavLink>
+            <NavLink href="/admin/voters">🔎 Voter&nbsp;Checker</NavLink>
+            <NavLink href="/admin/elections">📊 List&nbsp;Elections</NavLink>
+          </nav>
+        </div>
+
+        <button
+          onClick={() => {
+            disconnect()
+            router.replace('/login') // optional: redirect after disconnect
+          }}
+          className="w-full mt-6 bg-white text-green-700 font-semibold py-2 px-4 rounded hover:bg-green-100 transition"
+        >
+          🔌 Disconnect
+        </button>
       </aside>
 
       {/* Main content */}
