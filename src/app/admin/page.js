@@ -4,22 +4,89 @@ import { useEffect, useState } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend, ResponsiveContainer
 } from 'recharts'
+import { useAccount } from 'wagmi'
+import { readContract } from '@wagmi/core'
+import { parseAbi } from 'viem'
+import { config } from '@/app/config' // update path if needed
 
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A020F0']
 
-// Dummy data simulation (replace with blockchain contract calls)
-const elections = [
-  { id: 4, title: 'Student Council 2025', candidates: [{ name: 'Ali', votes: 10 }, { name: 'Sara', votes: 20 }] },
-  { id: 3, title: 'Tech Expo 2024', candidates: [{ name: 'Node', votes: 12 }, { name: 'React', votes: 18 }] },
-  { id: 2, title: 'City Election', candidates: [{ name: 'A', votes: 30 }, { name: 'B', votes: 10 }] },
-  { id: 1, title: 'Test Election 1', candidates: [{ name: 'X', votes: 7 }, { name: 'Y', votes: 13 }] },
-  { id: 0, title: 'Test Election 0', candidates: [{ name: 'One', votes: 5 }, { name: 'Two', votes: 15 }] }
-]
+const abi = parseAbi([
+  'function getAllElections() view returns (uint256[] ids, string[] titles, bool[] isLive)',
+  'function getCandidateCount(uint256 electionId) view returns (uint256)',
+  'function getCandidate(uint256 electionId, uint256 candidateId) view returns (string name, uint256 voteCount)'
+])
 
 export default function Page() {
-  const [selectedElection, setSelectedElection] = useState(elections[0])
+  const [elections, setElections] = useState([])
+  const [selectedElection, setSelectedElection] = useState(null)
+  const [candidates, setCandidates] = useState([])
 
-  const handleSelect  = (e) => {
+  const fetchElections = async () => {
+    try {
+      const result = await readContract(config, {
+        address: CONTRACT_ADDRESS,
+        abi,
+        functionName: 'getAllElections'
+      })
+
+      const ids = result[0]
+      const titles = result[1]
+      const lastFive = ids.slice(-5).map((id, index) => ({
+        id: Number(id),
+        title:`Election ${id}`
+      }))
+
+      setElections(lastFive)
+      setSelectedElection(lastFive[lastFive.length - 1]) // default to latest
+    } catch (err) {
+      console.error('Error fetching elections:', err)
+    }
+  }
+
+  const fetchCandidates = async (electionId) => {
+    try {
+      const count = await readContract(config, {
+        address: CONTRACT_ADDRESS,
+        abi,
+        functionName: 'getCandidateCount',
+        args: [BigInt(electionId)]
+      })
+
+      const candidateData = await Promise.all(
+        Array.from({ length: Number(count) }).map((_, i) =>
+          readContract(config, {
+            address: CONTRACT_ADDRESS,
+            abi,
+            functionName: 'getCandidate',
+            args: [BigInt(electionId), BigInt(i)]
+          })
+        )
+      )
+
+      const formatted = candidateData.map(([name, votes]) => ({
+        name,
+        votes: Number(votes)
+      }))
+
+      setCandidates(formatted)
+    } catch (err) {
+      console.error('Error fetching candidates:', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchElections()
+  }, [])
+
+  useEffect(() => {
+    if (selectedElection) {
+      fetchCandidates(selectedElection.id)
+    }
+  }, [selectedElection])
+
+  const handleSelect = (e) => {
     const selectedId = parseInt(e.target.value)
     const election = elections.find(el => el.id === selectedId)
     if (election) setSelectedElection(election)
@@ -52,7 +119,7 @@ export default function Page() {
         <div className="bg-white p-6 rounded shadow">
           <h2 className="text-xl font-semibold mb-4 text-center">📊 Votes per Candidate</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={selectedElection.candidates}>
+            <BarChart data={candidates}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
@@ -67,13 +134,13 @@ export default function Page() {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={selectedElection.candidates}
+                data={candidates}
                 dataKey="votes"
                 nameKey="name"
                 outerRadius={100}
                 label
               >
-                {selectedElection.candidates.map((_, index) => (
+                {candidates.map((_, index) => (
                   <Cell key={index} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
