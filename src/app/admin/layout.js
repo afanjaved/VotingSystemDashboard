@@ -29,9 +29,9 @@ export default function AdminLayout({ children }) {
       {/* Sidebar */}
       <aside className="w-64 bg-green-700 text-white p-6 flex flex-col justify-between">
         <div>
-          <Link href="/admin" className="flex items-center justify-center mb-6">
+          <Link href="/admin" className="flex items-center justify-start mb-6">
             <Image
-              src="/logo.png"
+              src="/logo2.png"
               alt="Votify Logo"
               width={160}
               height={60}

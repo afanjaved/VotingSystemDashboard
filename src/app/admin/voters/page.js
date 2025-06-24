@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { useReadContract } from 'wagmi'
 import { readContract } from '@wagmi/core'
+import toast from 'react-hot-toast'
 
 import { parseAbi } from 'viem'
 
@@ -45,7 +46,7 @@ export default function VoterWhitelistCheckPage() {
 
   const checkStatus = async () => {
     if (!electionId || !isAddress(voterAddress)) {
-      alert('Enter valid election ID and address.')
+      toast.error('Enter valid election ID and address.')
       return
     }
 
@@ -73,7 +74,7 @@ export default function VoterWhitelistCheckPage() {
       setVoted(hasVoted)
     } catch (err) {
       console.error(err)
-      alert('Error fetching voter status.')
+      toast.error('Error fetching voter status.')
     }
     setLoading(false)
   }

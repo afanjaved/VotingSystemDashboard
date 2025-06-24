@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi'
 import { readContract } from '@wagmi/core'
 import { parseAbi } from 'viem'
 import { config } from '@/app/config' // update path if needed
+import toast from 'react-hot-toast'
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A020F0']

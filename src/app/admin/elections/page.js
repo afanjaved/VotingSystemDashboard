@@ -5,6 +5,7 @@ import { useReadContract } from 'wagmi'
 import { parseAbi } from 'viem'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import toast from 'react-hot-toast'
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const abi = parseAbi([
